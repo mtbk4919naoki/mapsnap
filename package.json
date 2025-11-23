@@ -21,5 +21,10 @@
     "puppeteer": "^24.31.0",
     "sitemap-generator": "^8.5.1",
     "xml2js": "^0.6.2"
+  },
+  "overrides": {
+    "async": "^3.2.6",
+    "url-parse": "^1.5.10",
+    "nth-check": "^2.1.1"
   }
 }
