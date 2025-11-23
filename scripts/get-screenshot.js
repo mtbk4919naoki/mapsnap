@@ -17,6 +17,7 @@ async function getScreenshot() {
     .option('-r, --repeat <number>', '各階層での取得上限', '9')
     .option('-l, --limit <number>', '全体の取得上限', '100')
     .option('-c, --compress', 'PNG画像を圧縮する')
+    .option('-s, --sp', 'SP版（スマートフォン版）のスクリーンショットも取得する')
     .option('-y, --yes', 'エラー時に自動続行')
     .parse();
 
@@ -25,6 +26,7 @@ async function getScreenshot() {
   const repeat = parseInt(program.opts().repeat);
   const limit = parseInt(program.opts().limit);
   const compress = program.opts().compress;
+  const sp = program.opts().sp;
   const autoContinue = program.opts().yes;
 
   try {
@@ -41,7 +43,7 @@ async function getScreenshot() {
     console.log(`[処理] ${filteredUrls.length}件のURLを処理します`);
 
     // スクリーンショット取得
-    await takeScreenshots(filteredUrls, limit, autoContinue, compress);
+    await takeScreenshots(filteredUrls, limit, autoContinue, compress, sp);
 
     console.log('[完了] すべてのスクリーンショット取得が完了しました');
   } catch (error) {
@@ -163,10 +165,11 @@ function getParentPath(url, depth) {
 /**
  * スクリーンショットを取得
  */
-async function takeScreenshots(urls, limit, autoContinue, compress) {
+async function takeScreenshots(urls, limit, autoContinue, compress, sp) {
   const screenshotDir = path.join(process.cwd(), 'dist', 'screenshot');
   let pageId = 1;
   let browser = null;
+  let spBrowser = null;
 
   try {
     // ディレクトリが存在しない場合は作成
@@ -178,6 +181,15 @@ async function takeScreenshots(urls, limit, autoContinue, compress) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
+
+    // SP版用のブラウザとページ
+    let spPage = null;
+    if (sp) {
+      spBrowser = await puppeteer.launch();
+      spPage = await spBrowser.newPage();
+      await spPage.setViewport({ width: 375, height: 667 });
+      await spPage.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1');
+    }
 
     const total = Math.min(urls.length, limit);
 
@@ -207,8 +219,22 @@ async function takeScreenshots(urls, limit, autoContinue, compress) {
           }
         }
 
-        // スクリーンショット取得処理
-        await takeScreenshot(page, url, screenshotDir, pageId, compress);
+        // 通常版のスクリーンショット取得処理
+        await takeScreenshot(page, url, screenshotDir, pageId, compress, false);
+
+        // SP版のスクリーンショット取得処理
+        if (sp && spPage) {
+          try {
+            await spPage.goto(url, {
+              waitUntil: 'networkidle0',
+              timeout: 30000,
+            });
+            await takeScreenshot(spPage, url, screenshotDir, pageId, compress, true);
+          } catch (error) {
+            console.log(`[警告] SP版スクリーンショット取得に失敗しました: ${url} - ${error.message}`);
+          }
+        }
+
         pageId++;
       } catch (error) {
         const message = `エラーが発生しました: ${url} - ${error.message}`;
@@ -233,13 +259,17 @@ async function takeScreenshots(urls, limit, autoContinue, compress) {
       await browser.close();
       console.log('[完了] ブラウザを終了しました');
     }
+    if (spBrowser) {
+      await spBrowser.close();
+      console.log('[完了] SP版ブラウザを終了しました');
+    }
   }
 }
 
 /**
  * スクリーンショットを撮影
  */
-async function takeScreenshot(page, url, screenshotDir, pageId, compress) {
+async function takeScreenshot(page, url, screenshotDir, pageId, compress, isSp = false) {
   // アニメーション待機（1秒）
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -276,7 +306,8 @@ async function takeScreenshot(page, url, screenshotDir, pageId, compress) {
   urlPath = urlPath.replace(/^\/+/, '').replace(/\/+$/, '');
   // スラッシュを__に置換
   urlPath = urlPath.replace(/\//g, '__') || 'index';
-  const filename = `${String(pageId).padStart(4, '0')}_${urlPath}.png`;
+  const spSuffix = isSp ? '_sp' : '';
+  const filename = `${String(pageId).padStart(4, '0')}_${urlPath}${spSuffix}.png`;
   const filepath = path.join(screenshotDir, filename);
 
   // スクリーンショットを保存
@@ -291,10 +322,12 @@ async function takeScreenshot(page, url, screenshotDir, pageId, compress) {
         adaptiveFiltering: true
       })
       .toFile(filepath);
-    console.log(`[完了] スクリーンショット保存（圧縮済み）: ${filename}`);
+    const spLabel = isSp ? '（SP版・圧縮済み）' : '（圧縮済み）';
+    console.log(`[完了] スクリーンショット保存${spLabel}: ${filename}`);
   } else {
     await fs.writeFile(filepath, screenshotBuffer);
-    console.log(`[完了] スクリーンショット保存: ${filename}`);
+    const spLabel = isSp ? '（SP版）' : '';
+    console.log(`[完了] スクリーンショット保存${spLabel}: ${filename}`);
   }
 }
 
