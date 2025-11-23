@@ -9,12 +9,14 @@ async function setup() {
   try {
     const distDir = path.join(process.cwd(), 'dist');
     const screenshotDir = path.join(distDir, 'screenshot');
+    const outputDir = path.join(process.cwd(), 'output');
 
     console.log('[処理] ディレクトリを作成中...');
 
     // ディレクトリ作成
     await fs.mkdir(distDir, { recursive: true });
     await fs.mkdir(screenshotDir, { recursive: true });
+    await fs.mkdir(outputDir, { recursive: true });
     console.log('[完了] ディレクトリ作成完了');
 
     // クリーンアップ
