@@ -1,9 +1,8 @@
-# mapsnap
-
-**サイトマップ・スクリーンショット取得ツール**   
-composed by [NYCreation](https://nycreation.jp)
+# mapsnap - サイトマップ・スクリーンショット取得ツール
 
 WebサイトのURLを指定すると、サイトマップの取得または生成を行い、それを元にスクリーンショットを保存するCLIアプリケーションです。
+
+composed by [NYCreation](https://nycreation.jp)
 
 ## セットアップ
 
