@@ -1,0 +1,26 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node scripts/start.js",
+    "setup": "node scripts/setup.js",
+    "gen-sitemap": "node scripts/gen-sitemap.js",
+    "get-screenshot": "node scripts/get-screenshot.js",
+    "zip": "node scripts/zip.js",
+    "sitemap": "node sitemap.js.example",
+    "screenshot": "node screenshot.js.example",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "commander": "^14.0.2",
+    "puppeteer": "^24.31.0",
+    "sitemap-generator": "^8.5.1",
+    "sitemap-generator-cli": "^7.5.0",
+    "xml2js": "^0.6.2"
+  }
+}
