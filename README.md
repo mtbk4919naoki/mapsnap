@@ -36,7 +36,7 @@ npm run start
 
 対話式で以下を設定できます：
 - サイトのURL
-- 既存のsitemap.xmlを使用するか
+- 既存のsitemap.xmlのURL（空欄の場合は自動生成）
 - スクリーンショット取得のオプション（階層、上限など）
 - zipファイルの作成
 
@@ -48,7 +48,7 @@ npm run start
 npm run setup
 ```
 
-出力ディレクトリ（`./dist/`、`./dist/screenshot/`）を作成し、既存ファイルをクリーンアップします。
+出力ディレクトリ（`./dist/`、`./dist/screenshot/`、`./output/`）を作成し、既存ファイルをクリーンアップします。
 
 #### 2. サイトマップの生成・取得
 

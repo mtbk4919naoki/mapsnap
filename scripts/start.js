@@ -66,15 +66,12 @@ async function main() {
       process.exit(1);
     }
 
-    const useExistingSitemap = await question('既存のsitemap.xmlを使用しますか？ (y/n) [n]: ');
     const genSitemapScript = path.join(__dirname, 'gen-sitemap.js');
     const genSitemapArgs = [url];
     
-    if (useExistingSitemap.toLowerCase() === 'y' || useExistingSitemap.toLowerCase() === 'yes') {
-      const sitemapUrl = await question('sitemap.xmlのURLを入力してください: ');
-      if (sitemapUrl) {
-        genSitemapArgs.push('-m', sitemapUrl);
-      }
+    const sitemapUrl = await question('既存のsitemap.xmlのURLを入力してください（空欄の場合は自動生成）: ');
+    if (sitemapUrl) {
+      genSitemapArgs.push('-m', sitemapUrl);
     }
 
     console.log(`\n実行コマンド: node ${genSitemapScript} ${genSitemapArgs.join(' ')}`);
