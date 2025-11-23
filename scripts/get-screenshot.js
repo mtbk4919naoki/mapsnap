@@ -70,7 +70,7 @@ async function parseSitemap(sitemapPath) {
  */
 function filterUrls(urls, depth, repeat, limit) {
   const filtered = [];
-  const depthCounts = {}; // 階層ごとのカウント
+  const groupCounts = {}; // 階層と親パスの組み合わせごとのカウント
 
   for (const url of urls) {
     if (filtered.length >= limit) {
@@ -84,15 +84,18 @@ function filterUrls(urls, depth, repeat, limit) {
       continue;
     }
 
-    // repeatフィルタ（各階層ごとに上限をリセット）
+    // repeatフィルタ（各階層と親パスの組み合わせごとに上限をリセット）
     if (repeat !== 0) {
-      if (!depthCounts[urlDepth]) {
-        depthCounts[urlDepth] = 0;
+      const parentPath = getParentPath(url, urlDepth);
+      const groupKey = `${urlDepth}:${parentPath}`;
+      
+      if (!groupCounts[groupKey]) {
+        groupCounts[groupKey] = 0;
       }
-      if (depthCounts[urlDepth] >= repeat) {
+      if (groupCounts[groupKey] >= repeat) {
         continue;
       }
-      depthCounts[urlDepth]++;
+      groupCounts[groupKey]++;
     }
 
     filtered.push(url);
@@ -117,6 +120,35 @@ function getDepth(url) {
     return pathname.split('/').filter((segment) => segment !== '').length;
   } catch (error) {
     return 0;
+  }
+}
+
+/**
+ * URLから親パスを取得（階層が異なる場合は別扱いにするため）
+ */
+function getParentPath(url, depth) {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+
+    if (depth === 0 || pathname === '/') {
+      return 'root';
+    }
+
+    // パスセグメントを取得
+    const segments = pathname.split('/').filter((segment) => segment !== '');
+    
+    // 親パスは階層-1までのセグメントを結合
+    // 例: hoge/foo/bar (階層2) → 親パス: hoge/foo
+    // 例: hoge/foo (階層1) → 親パス: hoge
+    if (depth === 1) {
+      return segments[0] || 'root';
+    }
+    
+    // 階層2以上の場合、親パスは depth-1 までのセグメント
+    return segments.slice(0, depth - 1).join('/') || 'root';
+  } catch (error) {
+    return 'root';
   }
 }
 
