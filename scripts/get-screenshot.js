@@ -53,10 +53,15 @@ async function getScreenshot() {
 async function parseSitemap(sitemapPath) {
   try {
     const xmlContent = await fs.readFile(sitemapPath, 'utf-8');
+    
+    if (!xmlContent || xmlContent.trim() === '') {
+      throw new Error('sitemap.xmlが空です。サイトマップの生成に失敗した可能性があります。');
+    }
+    
     const parsed = await parseStringPromise(xmlContent);
 
-    if (!parsed.urlset || !parsed.urlset.url) {
-      throw new Error('無効なsitemap.xml形式です');
+    if (!parsed || !parsed.urlset || !parsed.urlset.url) {
+      throw new Error('無効なsitemap.xml形式です。サイトマップの生成に失敗した可能性があります。');
     }
 
     return parsed.urlset.url.map((url) => url.loc[0]);
