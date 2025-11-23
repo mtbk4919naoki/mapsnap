@@ -16,16 +16,16 @@ async function getScreenshot() {
     .option('-d, --depth <number>', '階層の深さ', '0')
     .option('-r, --repeat <number>', '各階層での取得上限', '9')
     .option('-l, --limit <number>', '全体の取得上限', '100')
-    .option('-y, --yes', 'エラー時に自動続行')
     .option('-c, --compress', 'PNG画像を圧縮する')
+    .option('-y, --yes', 'エラー時に自動続行')
     .parse();
 
   const sitemapPath = program.args[0] || './dist/sitemap.xml';
   const depth = parseInt(program.opts().depth);
   const repeat = parseInt(program.opts().repeat);
   const limit = parseInt(program.opts().limit);
-  const autoContinue = program.opts().yes;
   const compress = program.opts().compress;
+  const autoContinue = program.opts().yes;
 
   try {
     const fullSitemapPath = path.isAbsolute(sitemapPath)
