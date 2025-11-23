@@ -33,6 +33,7 @@ npm run start
    - 各階層での取得上限（既定: 9）
    - 全体の取得上限（既定: 100）
    - エラー時の自動続行（既定: n）
+   - PNG画像の圧縮（既定: y）
 4. zipファイルの作成（選択可）
 
 **注意:**
@@ -89,7 +90,7 @@ npm run get-screenshot ["./dist/sitemap.xml"]
 
 **ファイル名規則:**
 - 取得順に `pageID（Increment 4digit zero-fill）_urlPath（/を__に置換、末尾の/は削除）.png` とする
-- 例: `0001_index.png`, `0002_about__contact.png`, `0003_naoki-yamamoto-creation.png`
+- 例: `0001_index.png`, `0002_about__contact.png`, `0003_hoge__foo.png`
 
 **スクリーンショット設定:**
 - ビューポートサイズ: 1920x1080
@@ -122,6 +123,12 @@ npm run get-screenshot ["./dist/sitemap.xml"]
 `-y, --yes`  
 - 2xx系以外のHTTPレスポンスが発生した場合、確認ダイアログをスキップして全て続行する
 - このオプションがない場合、2xx以外のレスポンスでは続行確認ダイアログを表示する
+
+`-c, --compress`  
+- PNG画像を圧縮する
+- `sharp`ライブラリを使用してPNGを圧縮し、ファイルサイズを削減する
+- 圧縮率: quality 80, compressionLevel 9
+- ファイルサイズを大幅に削減できるが、処理時間が若干増加する
 
 **進捗表示:**
 - 現在実行中の処理を表示
@@ -159,7 +166,6 @@ npm run zip
 ### 使用パッケージ
 - `puppeteer`: スクリーンショット取得
 - `sitemap-generator`: サイトマップ生成
-- `sitemap-generator-cli`: サイトマップ生成（CLI）
 - `commander`: CLI引数解析
 - `xml2js`: XML解析
 - `archiver`: zipファイル作成

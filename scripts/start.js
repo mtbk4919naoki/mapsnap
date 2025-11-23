@@ -86,12 +86,16 @@ async function main() {
     const depth = await question('階層の深さ (0=無制限) [0]: ') || '0';
     const repeat = await question('各階層での取得上限 (0=無制限) [9]: ') || '9';
     const limit = await question('全体の取得上限 (0=無制限) [100]: ') || '100';
+    const compress = await question('PNG画像を圧縮しますか？ (y/n) [y]: ') || 'y';
     const autoContinue = await question('エラー時に自動続行しますか？ (y/n) [n]: ');
     
     const getScreenshotScript = path.join(__dirname, 'get-screenshot.js');
     const getScreenshotArgs = [sitemapPath, '-d', depth, '-r', repeat, '-l', limit];
     if (autoContinue.toLowerCase() === 'y' || autoContinue.toLowerCase() === 'yes') {
       getScreenshotArgs.push('-y');
+    }
+    if (compress.toLowerCase() === 'y' || compress.toLowerCase() === 'yes') {
+      getScreenshotArgs.push('-c');
     }
 
     console.log(`\n実行コマンド: node ${getScreenshotScript} ${getScreenshotArgs.join(' ')}`);

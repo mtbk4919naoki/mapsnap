@@ -88,6 +88,7 @@ npm run get-screenshot -- -d 2 -r 5 -l 50 -y
   - 階層が異なる場合は別扱いになる（例: `hoge/foo`, `hoge/bar` と `fuga/foo`, `fuga/bar` は別グループ）
 - `-l, --limit <number>`: 全体の取得上限（既定値: `100`）
 - `-y, --yes`: エラー時に自動続行
+- `-c, --compress`: PNG画像を圧縮（ファイルサイズを削減）
 
 **出力:**
 - `./dist/screenshot/` にスクリーンショットを保存

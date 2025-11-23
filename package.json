@@ -19,6 +19,7 @@
     "archiver": "^7.0.1",
     "commander": "^14.0.2",
     "puppeteer": "^24.31.0",
+    "sharp": "^0.33.5",
     "sitemap-generator": "^8.5.1",
     "xml2js": "^0.6.2"
   },

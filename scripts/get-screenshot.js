@@ -4,6 +4,7 @@ const path = require('path');
 const { program } = require('commander');
 const { parseStringPromise } = require('xml2js');
 const readline = require('readline');
+const sharp = require('sharp');
 
 /**
  * get-screenshotコマンド
@@ -16,6 +17,7 @@ async function getScreenshot() {
     .option('-r, --repeat <number>', '各階層での取得上限', '9')
     .option('-l, --limit <number>', '全体の取得上限', '100')
     .option('-y, --yes', 'エラー時に自動続行')
+    .option('-c, --compress', 'PNG画像を圧縮する')
     .parse();
 
   const sitemapPath = program.args[0] || './dist/sitemap.xml';
@@ -23,6 +25,7 @@ async function getScreenshot() {
   const repeat = parseInt(program.opts().repeat);
   const limit = parseInt(program.opts().limit);
   const autoContinue = program.opts().yes;
+  const compress = program.opts().compress;
 
   try {
     const fullSitemapPath = path.isAbsolute(sitemapPath)
@@ -38,7 +41,7 @@ async function getScreenshot() {
     console.log(`[処理] ${filteredUrls.length}件のURLを処理します`);
 
     // スクリーンショット取得
-    await takeScreenshots(filteredUrls, limit, autoContinue);
+    await takeScreenshots(filteredUrls, limit, autoContinue, compress);
 
     console.log('[完了] すべてのスクリーンショット取得が完了しました');
   } catch (error) {
@@ -160,7 +163,7 @@ function getParentPath(url, depth) {
 /**
  * スクリーンショットを取得
  */
-async function takeScreenshots(urls, limit, autoContinue) {
+async function takeScreenshots(urls, limit, autoContinue, compress) {
   const screenshotDir = path.join(process.cwd(), 'dist', 'screenshot');
   let pageId = 1;
   let browser = null;
@@ -205,7 +208,7 @@ async function takeScreenshots(urls, limit, autoContinue) {
         }
 
         // スクリーンショット取得処理
-        await takeScreenshot(page, url, screenshotDir, pageId);
+        await takeScreenshot(page, url, screenshotDir, pageId, compress);
         pageId++;
       } catch (error) {
         const message = `エラーが発生しました: ${url} - ${error.message}`;
@@ -236,7 +239,7 @@ async function takeScreenshots(urls, limit, autoContinue) {
 /**
  * スクリーンショットを撮影
  */
-async function takeScreenshot(page, url, screenshotDir, pageId) {
+async function takeScreenshot(page, url, screenshotDir, pageId, compress) {
   // アニメーション待機（1秒）
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -277,8 +280,22 @@ async function takeScreenshot(page, url, screenshotDir, pageId) {
   const filepath = path.join(screenshotDir, filename);
 
   // スクリーンショットを保存
-  await page.screenshot({ path: filepath, fullPage: true });
-  console.log(`[完了] スクリーンショット保存: ${filename}`);
+  const screenshotBuffer = await page.screenshot({ fullPage: true });
+  
+  if (compress) {
+    // PNG圧縮
+    await sharp(screenshotBuffer)
+      .png({ 
+        quality: 80,
+        compressionLevel: 9,
+        adaptiveFiltering: true
+      })
+      .toFile(filepath);
+    console.log(`[完了] スクリーンショット保存（圧縮済み）: ${filename}`);
+  } else {
+    await fs.writeFile(filepath, screenshotBuffer);
+    console.log(`[完了] スクリーンショット保存: ${filename}`);
+  }
 }
 
 /**
