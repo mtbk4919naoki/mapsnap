@@ -81,7 +81,7 @@ npm run get-screenshot -- -d 2 -r 5 -l 50 -y
 ```
 
 **オプション:**
-- `-d, --depth <number>`: 階層の深さ（`-1`=無制限、既定値: `-1`）
+- `-d, --depth <number>`: 階層の深さ（`0`=無制限、既定値: `0`）
 - `-r, --repeat <number>`: 各階層と親パスの組み合わせでの取得上限（`0`=無制限、既定値: `9`）
   - 階層が異なる場合は別扱いになる（例: `hoge/foo`, `hoge/bar` と `fuga/foo`, `fuga/bar` は別グループ）
 - `-l, --limit <number>`: 全体の取得上限（既定値: `100`）

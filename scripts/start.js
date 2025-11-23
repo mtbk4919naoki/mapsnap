@@ -83,7 +83,7 @@ async function main() {
     const sitemapPath = './dist/sitemap.xml'; // startコマンドでは常にdist/sitemap.xmlを使用
     
     // オプション設定
-    const depth = await question('階層の深さ (-1=無制限) [-1]: ') || '-1';
+    const depth = await question('階層の深さ (0=無制限) [0]: ') || '0';
     const repeat = await question('各階層での取得上限 (0=無制限) [9]: ') || '9';
     const limit = await question('全体の取得上限 (0=無制限) [100]: ') || '100';
     const autoContinue = await question('エラー時に自動続行しますか？ (y/n) [n]: ');

@@ -12,7 +12,7 @@ const readline = require('readline');
 async function getScreenshot() {
   program
     .argument('[sitemapPath]', 'sitemap.xmlのパス', './dist/sitemap.xml')
-    .option('-d, --depth <number>', '階層の深さ', '-1')
+    .option('-d, --depth <number>', '階層の深さ', '0')
     .option('-r, --repeat <number>', '各階層での取得上限', '9')
     .option('-l, --limit <number>', '全体の取得上限', '100')
     .option('-y, --yes', 'エラー時に自動続行')
@@ -79,8 +79,8 @@ function filterUrls(urls, depth, repeat, limit) {
 
     const urlDepth = getDepth(url);
 
-    // depthフィルタ
-    if (depth !== -1 && urlDepth > depth) {
+    // depthフィルタ（depth = 0 は無制限、それ以外は urlDepth < depth のものだけ取得）
+    if (depth !== 0 && urlDepth >= depth) {
       continue;
     }
 
